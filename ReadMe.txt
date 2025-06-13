@@ -1,32 +1,22 @@
-Steps to making this AI:
+Setup of the AI Wrapper:
+1. install dependencies
+ <todo add dependecies and install instructions>
+ -streamlit
 
-1. Extract Data Content
-	Use ReadMe’s API or scrape the webpage to retrieve structured documentation data.
-	Feed in Jsons of code bases using ____ Library
-
-Since your chatbot will reference documentation, store the extracted content in a database or embedding model (like Pinecone or FAISS for fast retrieval).
-
-2. Process & Index the Data – Store the extracted content in a searchable format, such as a vector database (e.g., Pinecone, Weaviate) or a simple text-based retrieval system.
-
-3. Integrate an AI Model 
-	– Use an AI model like OpenAI’s GPT or a custom NLP solution to process queries and retrieve relevant documentation snippets.
-
-4. Build the Chatbot Interface – Develop a chatbot UI using frameworks like Flask, FastAPI, or a frontend library like React.
-	-Lets use FastAPI
-
-from fastapi import FastAPI
-from pydantic import BaseModel
-from chatbot import get_response  # Your AI logic
-
-app = FastAPI()
-
-class Query(BaseModel):
-    user_input: str
-
-@app.post("/chat")
-def chat(query: Query):
-    response = get_response(query.user_input)  # Function to fetch relevant doc-based responses
-    return {"response": response}
+2. In order to run parser the following have to be running:
+- Ollama local instance needs to be running
+- on command line/IDE run: python -m streamlit run /OmegaAI/main.py
 
 
-5. Enhance with AI Wrappers – Implement an AI wrapper that abstracts API calls and improves response accuracy.
+
+
+
+Things to understand:
+- measurements of context
+- what makes the actual size of the ai model aka the big B
+- can I setup ollama to reference a database and if so what database?
+- how to make a searchable DB with some kind of process that can pull relevant info.
+
+TODO of fun things to add:
+- add history tracking so the ai can understand context
+- add better parsing of files on local directory to add to context sent to api
