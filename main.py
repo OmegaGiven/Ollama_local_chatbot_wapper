@@ -25,14 +25,14 @@ if user_input:
         response_container = st.empty()
 
         ai_response = ""
-        for chunk in ai_stream(user_input, document_text, selected_model):
+        for chunk in ai_stream(user_input, document_text, selected_model, None):
             ai_response += chunk
             response_container.markdown(ai_response)  # Stream response dynamically
             st.session_state["partial_response"] = ai_response  # Store progress
         
         
         st.session_state["messages"].append({"role": "assistant", "content": ai_response})
-
+        
 
 
 
