@@ -1,3 +1,10 @@
+"""
+run program by:
+python -m streamlit run /OmegaAI/main.py
+"""
+from package_installer import install_requirements
+install_requirements()
+
 import streamlit as st
 from ui_components import setup_ui, file_upload, display_chat_history, user_input_handler, setup_model_selection
 from ollama_api import ai_stream
