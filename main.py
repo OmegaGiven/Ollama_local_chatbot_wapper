@@ -1,18 +1,20 @@
 import streamlit as st
 from ui_components import setup_ui, file_upload, display_chat_history, user_input_handler, setup_model_selection
 from ollama_api import ai_stream
-import os
-import pypdf
 
 
 setup_ui()
+
+top_container = st.container()
+with top_container:
+    document_text = file_upload()
+    selected_model = setup_model_selection()
 
 # Set up UI components
 display_chat_history()
 user_input = user_input_handler()
 
-document_text = file_upload()
-selected_model = setup_model_selection()
+
 
 # Process user input and stream responses
 if user_input:
