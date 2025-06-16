@@ -8,12 +8,12 @@ Setup of the AI Wrapper:
 - on command line/IDE run: python -m streamlit run /OmegaAI/main.py
 
 
-
+helpful documentation for ollama rest api calls:
+https://www.postman.com/postman-student-programs/ollama-api/documentation/suc47x8/ollama-rest-api 
 
 
 Things to understand:
 - measurements of context
-- what makes the actual size of the ai model aka the big B
 - can I setup ollama to reference a database and if so what database?
 - how to make a searchable DB with some kind of process that can pull relevant info.
 

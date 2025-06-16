@@ -17,14 +17,35 @@ def get_available_models():
             return [f"Error parsing response: {e}"]
     return [f"Error fetching models: {response.status_code} - {response.text}"]
 
-def ai_stream(prompt, files="", model_name="qwen2.5-coder:32b", context=None):
-    """Stream AI responses based on the selected model."""
-    full_prompt = f"Referencing this document:\n{files}\n\nQuestion: {prompt}" if files else f"Question: {prompt}"
-    
-    payload = {"model": model_name, "prompt": full_prompt, "stream": True, "context": context}
+def ai_stream(
+        model="deepseek-r1:8b",
+        prompt="",
+        suffix="",
+        images=None, #May need to change to null
+        think=False, #dont know if this can just be a string
+        format=None, #same as above
+        options=None,
+        stream=True,
+        files=None, #will be added to context,
+        context=None, #for history of conversation
+        ):
+    """
+    Documentation for Ollama requests: https://github.com/ollama/ollama/blob/main/docs/api.md 
+    """
+    suffix = f"Referencing this document:\n{files}" if files else None
 
-    response = requests.post(OLLAMA_URL, json=payload, headers=HEADERS, stream=True)
-    print(response)
+    payload = {"model": model, 
+               "prompt": prompt,
+                "suffix": suffix,
+                "images": images,
+                "think": think,
+                "format": format,
+                "options": options,
+                "stream": stream, 
+                "context": context}
+
+    response = requests.post(OLLAMA_URL, json=payload, headers=HEADERS)
+    # print(response)
 
     start_time = time.time()
     total_tokens = 0

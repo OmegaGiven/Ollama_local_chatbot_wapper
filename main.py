@@ -9,12 +9,17 @@ top_container = st.container()
 with top_container:
     document_text = file_upload()
     selected_model = setup_model_selection()
+    directory = st.text_input("Enter directory path")
+
+
+if directory:
+    # Then process the directory
+    print()
+
 
 # Set up UI components
 display_chat_history()
 user_input = user_input_handler()
-
-
 
 # Process user input and stream responses
 if user_input:
@@ -27,7 +32,9 @@ if user_input:
         response_container = st.empty()
 
         ai_response = ""
-        for chunk in ai_stream(user_input, document_text, selected_model, None):
+        for chunk in ai_stream(model= selected_model,
+                               prompt=user_input, 
+                               files=document_text):
             ai_response += chunk
             response_container.markdown(ai_response)  # Stream response dynamically
             st.session_state["partial_response"] = ai_response  # Store progress
