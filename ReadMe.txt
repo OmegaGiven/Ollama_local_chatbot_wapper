@@ -3,6 +3,16 @@ Setup of the AI Wrapper:
  <todo add dependecies and install instructions>
  -streamlit
 
+ for linux:
+    python3 -m venv myenv
+    source myenv/bin/activate
+    python3 -m pip --version
+    python3 -m pip install --upgrade pip
+    pip install ollama-api
+
+
+
+
 2. In order to run parser the following have to be running:
 - Ollama local instance needs to be running
 - on command line/IDE run: python -m streamlit run /OmegaAI/main.py
