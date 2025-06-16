@@ -11,5 +11,4 @@ def install_requirements(required_packages = ["ollama_api", "pdfplumber", "strea
             subprocess.check_call(["pip", "install", package])
             # subprocess.check_call(["apt", "install", f"python3-{package}"])
 
-
 install_requirements()

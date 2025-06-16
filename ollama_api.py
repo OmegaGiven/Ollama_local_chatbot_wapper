@@ -22,7 +22,7 @@ def ai_stream(
         prompt="",
         suffix="",
         images=None, #May need to change to null
-        think=False, #dont know if this can just be a string
+        think=True, #dont know if this can just be a string
         format=None, #same as above
         options=None,
         stream=True,

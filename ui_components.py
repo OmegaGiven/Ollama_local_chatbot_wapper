@@ -1,10 +1,7 @@
 import streamlit as st
 from ollama_api import get_available_models
 import pdfplumber
-
-def setup_ui():
-    """Initialize Streamlit UI elements."""
-    st.title("AI Chatbot with Model Selection")
+from ollama_api import ai_stream
 
 def setup_model_selection():
     # Fetch available models
@@ -51,10 +48,6 @@ def display_chat_history():
         with st.chat_message(message["role"]):
             st.markdown(message["content"])
 
-def user_input_handler():
-    """Handles user input for chat."""
-    return st.chat_input("Ask something about the uploaded document...")
-
 def get_context_from_directory_and_subdirectories(path):
     """Collects text from all allowed files in the given path and its subdirectories."""
     texts = []
@@ -69,3 +62,69 @@ def get_context_from_directory_and_subdirectories(path):
                     pass
 
     return "\n\n".join(texts)
+
+def setup_ui():
+    """Initialize Streamlit UI elements."""
+    if "messages" not in st.session_state:
+        st.session_state["messages"] = []
+
+    st.title("AI Chatbot with Model Selection")
+
+    with st.sidebar:
+        # Top bar container with all persistent UI elements
+        if 'models' not in st.session_state or 'directory' not in st.session_state:
+            selected_model = setup_model_selection()
+            directory_input = st.text_input("Enter directory path", key="directory")
+
+            # Store the directory input value in session state to keep it across reruns
+            if directory_input:
+                st.session_state["directory"] = directory_input
+
+        else:
+            # If we're coming from a rerun, show all elements again
+            selected_model = setup_model_selection()
+            directory_input = st.text_input("Enter directory path", key="directory")
+
+            if directory_input and 'directory' not in st.session_state or st.session_state['directory'] != directory_input:
+                # Only update session state if the value changes (or is new)
+                st.session_state["directory"] = directory_input
+        document_text = file_upload()
+
+        think = st.selectbox("Enable Think for AI Thinking models:", [True, False])
+        stream = st.selectbox("AI response streamed:", [True, False])
+        remember_history = st.selectbox("Remember Chat history:", [True, False])
+
+        
+
+    
+    # User input area in the right column
+
+    display_chat_history()
+    user_input = st.chat_input("Ask something about the uploaded document...")
+    history = []
+    # Process user input and stream responses
+    if user_input:
+        st.session_state["messages"].append({"role": "user", "content": f"{user_input} ( {selected_model})"})
+        # Display user input in chat
+        with st.chat_message("user"):
+            st.markdown( f"{user_input} ({selected_model})")
+        # Stream AI response
+        with st.chat_message("assistant"):
+            response_container = st.empty()
+            ai_response = ""
+            for chunk in ai_stream(model= selected_model,
+                                prompt=user_input, 
+                                files=document_text,
+                                think=think,
+                                stream=stream,
+                                context=history if remember_history else None,
+                                ):
+                ai_response += chunk
+                response_container.markdown(ai_response)  # Stream response dynamically
+                st.session_state["partial_response"] = ai_response  # Store progress
+
+            st.session_state["messages"].append({"role": "assistant", "content": ai_response})
+            history.append(f"User Input:{user_input} AI Response: {ai_response}")
+
+
+
