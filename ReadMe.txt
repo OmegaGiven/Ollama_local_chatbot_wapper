@@ -8,7 +8,8 @@ Setup of the AI Wrapper:
     source myenv/bin/activate
     python3 -m pip --version
     python3 -m pip install --upgrade pip
-    pip install ollama-api
+    python3 -m pip install pdfplumber
+    python3 -m pip install  streamlit
 
 
 
@@ -28,5 +29,4 @@ Things to understand:
 - how to make a searchable DB with some kind of process that can pull relevant info.
 
 TODO of fun things to add:
-- add history tracking so the ai can understand context
 - add better parsing of files on local directory to add to context sent to api
