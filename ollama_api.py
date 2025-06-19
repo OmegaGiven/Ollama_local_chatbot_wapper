@@ -17,34 +17,58 @@ def get_available_models():
             return [f"Error parsing response: {e}"]
     return [f"Error fetching models: {response.status_code} - {response.text}"]
 
+
+context = []
+
 def ai_stream(
         model="deepseek-r1:8b",
         prompt="",
         suffix="",
-        images=None, #May need to change to null
-        think=True, #dont know if this can just be a string
+        think=None, #dont know if this can just be a string
         format=None, #same as above
         options=None,
         stream=True,
         files=None, #will be added to context,
-        context=None, #for history of conversation
+        messages=None, #will be added to context,
         ):
     """
     Documentation for Ollama requests: https://github.com/ollama/ollama/blob/main/docs/api.md 
     """
+    global context
+    
     suffix = f"Referencing this document:\n{files}" if files else None
 
-    payload = {"model": model, 
-               "prompt": prompt,
-                "suffix": suffix,
-                "images": images,
-                "think": think,
-                "format": format,
-                "options": options,
-                "stream": stream, 
-                "context": context}
+    print(f"""AI input: 
+        Using model: {model}, 
+        prompt: {prompt}, 
+        suffix: {suffix},
+        think: {think},
+        options: {options}, 
+        stream: {stream}, 
+        files: {files}, 
+        messages: {messages}""")
+    
+    payload = {
+        "model": model, 
+        "prompt": prompt,
+        "options": options,
+            }
+    if think != True:
+        payload["think"] = think
+    if suffix:
+        payload["suffix"] = suffix
+    if format:
+        payload["format"] = format
+    if messages:
+        payload["messages"] = messages
+        payload["context"] = context
+        # response = requests.post(OLLAMA_URL, messages=context, json=payload, stream=stream)
+    # else:
+    #     response = requests.post(OLLAMA_URL, json=payload, stream=stream)
 
-    response = requests.post(OLLAMA_URL, json=payload, headers=HEADERS)
+    response = requests.post(OLLAMA_URL, json=payload, stream=stream)
+    # print(json.loads(response.content.decode("utf-8")).get("context"))
+
     # print(response)
 
     start_time = time.time()
@@ -54,11 +78,17 @@ def ai_stream(
         if line:
             try:
                 data = json.loads(line)
-                
+                print(f"Received data: {data}")  # Debugging line to see the response structure
                 token_count = len(data["response"].split())
                 total_tokens += token_count
 
+                
                 yield data["response"]  # Extract only AI response text
+
+                if data.get("context") is not None:
+                    context = data["context"]
+
+
             except json.JSONDecodeError:
                 pass  # Ignore malformed lines
 

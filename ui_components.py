@@ -1,7 +1,7 @@
 import streamlit as st
-from ollama_api import get_available_models
+from ollama_api import get_available_models, ai_stream
 import pdfplumber
-from ollama_api import ai_stream
+import os
 
 def setup_model_selection():
     # Fetch available models
@@ -63,14 +63,8 @@ def get_context_from_directory_and_subdirectories(path):
 
     return "\n\n".join(texts)
 
-def setup_ui():
-    """Initialize Streamlit UI elements."""
-    if "messages" not in st.session_state:
-        st.session_state["messages"] = []
-
-    st.title("AI Chatbot with Model Selection")
-
-    with st.sidebar:
+def create_sidebar():
+     with st.sidebar:
         # Top bar container with all persistent UI elements
         if 'models' not in st.session_state or 'directory' not in st.session_state:
             selected_model = setup_model_selection()
@@ -94,20 +88,30 @@ def setup_ui():
         stream = st.selectbox("AI response streamed:", [True, False])
         remember_history = st.selectbox("Remember Chat history:", [True, False])
 
-        
+        return selected_model, document_text, think, stream, remember_history
 
-    
-    # User input area in the right column
+history = []
 
+def setup_ui():
+    """Initialize Streamlit UI elements."""
+    if "messages" not in st.session_state:
+        st.session_state["messages"] = []
+
+    st.title("AI Chatbot with Model Selection")
+    selected_model, document_text, think, stream, remember_history = create_sidebar()
+
+    # User input area in the right side
     display_chat_history()
     user_input = st.chat_input("Ask something about the uploaded document...")
-    history = []
     # Process user input and stream responses
     if user_input:
         st.session_state["messages"].append({"role": "user", "content": f"{user_input} ( {selected_model})"})
         # Display user input in chat
         with st.chat_message("user"):
             st.markdown( f"{user_input} ({selected_model})")
+        history.append({"role": "user", "content": user_input})
+
+
         # Stream AI response
         with st.chat_message("assistant"):
             response_container = st.empty()
@@ -117,14 +121,15 @@ def setup_ui():
                                 files=document_text,
                                 think=think,
                                 stream=stream,
-                                context=history if remember_history else None,
+                                messages=history if remember_history else None,
                                 ):
                 ai_response += chunk
                 response_container.markdown(ai_response)  # Stream response dynamically
                 st.session_state["partial_response"] = ai_response  # Store progress
 
             st.session_state["messages"].append({"role": "assistant", "content": ai_response})
-            history.append(f"User Input:{user_input} AI Response: {ai_response}")
+            history.append({"role": "assistant", "content": ai_response})
+            # print(history)
 
 
 
