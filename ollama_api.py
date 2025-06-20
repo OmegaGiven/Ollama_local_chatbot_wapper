@@ -23,7 +23,6 @@ context = []
 def ai_stream(
         model="deepseek-r1:8b",
         prompt="",
-        suffix="",
         think=None, #dont know if this can just be a string
         format=None, #same as above
         options=None,
@@ -35,13 +34,12 @@ def ai_stream(
     Documentation for Ollama requests: https://github.com/ollama/ollama/blob/main/docs/api.md 
     """
     global context
-    
-    suffix = f"Referencing this document:\n{files}" if files else None
+
+    prompt +=  f"Referencing this document:\n{files}" if files else ""
 
     print(f"""AI input: 
         Using model: {model}, 
-        prompt: {prompt}, 
-        suffix: {suffix},
+        prompt: {prompt},
         think: {think},
         options: {options}, 
         stream: {stream}, 
@@ -55,12 +53,10 @@ def ai_stream(
             }
     if think != True:
         payload["think"] = think
-    if suffix:
-        payload["suffix"] = suffix
     if format:
         payload["format"] = format
     if messages:
-        payload["messages"] = messages
+        # payload["messages"] = messages # This is not used in the current Ollama API
         payload["context"] = context
         # response = requests.post(OLLAMA_URL, messages=context, json=payload, stream=stream)
     # else:
@@ -78,7 +74,7 @@ def ai_stream(
         if line:
             try:
                 data = json.loads(line)
-                print(f"Received data: {data}")  # Debugging line to see the response structure
+                # print(f"Received data: {data}")  # Debugging line to see the response structure
                 token_count = len(data["response"].split())
                 total_tokens += token_count
 

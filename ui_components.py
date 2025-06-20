@@ -63,6 +63,15 @@ def get_context_from_directory_and_subdirectories(path):
 
     return "\n\n".join(texts)
 
+def create_txt_file(document_text):
+    """Create a .txt file from the extracted document text."""
+    if document_text:
+        with open("extracted_text.txt", "w", encoding="utf-8") as txt_file:
+            txt_file.write(document_text)
+        print("Text file created successfully.")
+    else:
+        print("No document text available to create a file.")
+
 def create_sidebar():
      with st.sidebar:
         # Top bar container with all persistent UI elements
@@ -87,6 +96,9 @@ def create_sidebar():
         think = st.selectbox("Enable Think for AI Thinking models:", [True, False])
         stream = st.selectbox("AI response streamed:", [True, False])
         remember_history = st.selectbox("Remember Chat history:", [True, False])
+
+        st.button("Print to console PDF text", on_click=lambda: print(document_text))
+        st.button("Create txt file from PDF text", on_click=lambda: create_txt_file(document_text))
 
         return selected_model, document_text, think, stream, remember_history
 
