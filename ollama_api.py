@@ -1,3 +1,4 @@
+"""API client for interacting with the Ollama AI service"""
 import requests
 import json
 import time
@@ -24,11 +25,10 @@ def ai_stream(
         model="deepseek-r1:8b",
         prompt="",
         think=None, #dont know if this can just be a string
-        format=None, #same as above
-        options=None,
         stream=True,
         files=None, #will be added to context,
         messages=None, #will be added to context,
+        repository=None, #will be added to context
         ):
     """
     Documentation for Ollama requests: https://github.com/ollama/ollama/blob/main/docs/api.md 
@@ -36,12 +36,12 @@ def ai_stream(
     global context
 
     prompt +=  f"Referencing this document:\n{files}" if files else ""
+    prompt +=  f"Referencing this repository and its code:\n{repository}" if repository else ""
 
     print(f"""AI input: 
         Using model: {model}, 
         prompt: {prompt},
         think: {think},
-        options: {options}, 
         stream: {stream}, 
         files: {files}, 
         messages: {messages}""")
@@ -49,23 +49,13 @@ def ai_stream(
     payload = {
         "model": model, 
         "prompt": prompt,
-        "options": options,
             }
     if think != True:
         payload["think"] = think
-    if format:
-        payload["format"] = format
     if messages:
-        # payload["messages"] = messages # This is not used in the current Ollama API
         payload["context"] = context
-        # response = requests.post(OLLAMA_URL, messages=context, json=payload, stream=stream)
-    # else:
-    #     response = requests.post(OLLAMA_URL, json=payload, stream=stream)
 
     response = requests.post(OLLAMA_URL, json=payload, stream=stream)
-    # print(json.loads(response.content.decode("utf-8")).get("context"))
-
-    # print(response)
 
     start_time = time.time()
     total_tokens = 0
