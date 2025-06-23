@@ -1,6 +1,6 @@
 """
 run program by:
-python -m streamlit run /OmegaAI/main.py
+python -m streamlit run main.py
 """
 
 import streamlit as st

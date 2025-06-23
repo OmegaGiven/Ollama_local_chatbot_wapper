@@ -1,6 +1,6 @@
 import streamlit as st
 from ollama_api import get_available_models, ai_stream
-import pdfplumber
+from pdf_converter import read_pdf
 import os
 
 def setup_model_selection():
@@ -19,11 +19,9 @@ def file_upload():
         try:
             # Check the file extension
             ext = os.path.splitext(uploaded_file.name)[1].lower()
-            content_type = {"application/pdf": ".pdf", "text/plain": ".txt"}.get(uploaded_file.type, None)
 
             if ext == ".pdf":
-                with pdfplumber.open(uploaded_file) as pdf:
-                    return "\n".join([page.extract_text() for page in pdf.pages if page.extract_text()])
+                return read_pdf(uploaded_file)  # Use pdfplumber to read PDF files
             elif uploaded_file.type == "text/plain":
                 # For text files (txt, md, etc.) we can read directly
                 content = uploaded_file.read().decode('utf-8')
